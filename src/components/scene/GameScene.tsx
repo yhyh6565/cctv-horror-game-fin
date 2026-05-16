@@ -6,6 +6,8 @@ import Background from './Background'
 import GhostSilhouette from './GhostSilhouette'
 import CctvFilter from './CctvFilter'
 import ScenePlayer from './ScenePlayer'
+import WinCutscene from './WinCutscene'
+import BadEndingCutscene from './BadEndingCutscene'
 import FloorDisplay from '../ui/FloorDisplay'
 import GestureOverlay from '../ui/GestureOverlay'
 
@@ -193,6 +195,16 @@ export default function GameScene() {
           currentGesture={currentGesture}
           countdownMs={state.phase2SignalActive ? state.phase2SignalMs : undefined}
         />
+      )}
+
+      {/* Win Cutscene */}
+      {scene === 'WIN_CUTSCENE' && (
+        <WinCutscene onComplete={() => goTo('ESCAPE_FROST')} />
+      )}
+
+      {/* Bad Ending */}
+      {scene === 'BAD_ENDING' && (
+        <BadEndingCutscene onComplete={() => {}} />
       )}
     </div>
   )
