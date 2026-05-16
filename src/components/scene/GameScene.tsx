@@ -104,7 +104,6 @@ export default function GameScene() {
     else if (scene === 'SCENE_03') goTo('PHASE_1_RPS')
     else if (scene === 'PHASE_2_ENTRY') goTo('PHASE_2_RPS')
     else if (scene === 'PHASE_2_QUESTION') goTo('PHASE_2_RPS')
-    else if (scene === 'WIN_CUTSCENE') goTo('ESCAPE_FROST')
   }
 
   // suppress unused var warnings for isPointing (used by hand tracking callbacks)
