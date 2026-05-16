@@ -31,7 +31,7 @@ interface HandTrackingOptions {
   onHandLost: (seconds: number) => void
   onPointing: (isPointing: boolean) => void
   onPalmX: (x: number) => void
-  videoRef: RefObject<HTMLVideoElement>
+  videoRef: RefObject<HTMLVideoElement | null>
 }
 
 export function useHandTracking({
