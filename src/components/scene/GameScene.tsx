@@ -12,6 +12,8 @@ import FloorDisplay from '../ui/FloorDisplay'
 import GestureOverlay from '../ui/GestureOverlay'
 import FrostWipe from '../interaction/FrostWipe'
 import HoldButton from '../interaction/HoldButton'
+import TextBox from '../ui/TextBox'
+import QuestionInput from '../interaction/QuestionInput'
 
 
 const PHASE1_PARAMS = [
@@ -34,6 +36,8 @@ export default function GameScene() {
   const [isPointing, setIsPointing] = useState(false)
   const insightShownRef = useRef(false)
   const [showInsight, setShowInsight] = useState(false)
+  const [llmAnswer, setLlmAnswer] = useState<string | null>(null)
+  const [revealDone, setRevealDone] = useState(false)
 
   // Track hold progress for UI display
   useEffect(() => {
@@ -222,6 +226,23 @@ export default function GameScene() {
             onFail={() => goTo('BAD_ENDING')}
           />
         </>
+      )}
+
+      {/* TRUE_ENDING: question + LLM answer */}
+      {scene === 'TRUE_ENDING' && !llmAnswer && (
+        <>
+          <ScenePlayer sceneKey="SCENE_10" onComplete={() => {}} />
+          <QuestionInput onAnswer={a => setLlmAnswer(a)} />
+        </>
+      )}
+      {scene === 'TRUE_ENDING' && llmAnswer && !revealDone && (
+        <TextBox
+          line={{ type: 'reveal', text: llmAnswer }}
+          onComplete={() => setRevealDone(true)}
+        />
+      )}
+      {scene === 'TRUE_ENDING' && llmAnswer && revealDone && (
+        <ScenePlayer sceneKey="TRUE_ENDING" onComplete={() => {}} />
       )}
     </div>
   )

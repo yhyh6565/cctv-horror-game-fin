@@ -27,4 +27,7 @@ describe('Keyword matching', () => {
   it('returns null for no match', () => {
     expect(matchKeyword('오늘 날씨 어때?')).toBeNull()
   })
+  it('returns null for empty string', () => {
+    expect(matchKeyword('')).toBeNull()
+  })
 })

@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/ask.ts": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
