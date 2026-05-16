@@ -76,7 +76,11 @@ export default function GameScene() {
   useEffect(() => {
     if (scene === 'PHASE_1_RPS') play('elevator_loop')
     if (scene === 'PHASE_2_ENTRY') { stop('elevator_loop'); play('glitch') }
-    if (scene === 'WIN_CUTSCENE') play('mirror_bang')
+    if (scene === 'WIN_CUTSCENE') {
+      play('mirror_bang')
+      setTimeout(() => play('mirror_shatter'), 400)
+      setTimeout(() => play('ghost_laugh'), 1200)
+    }
     if (scene === 'BAD_ENDING') play('bad_drone')
     if (scene === 'DEAD_ENDING') play('dead_sting')
     if (scene === 'ESCAPE_HOLD') play('whisper')
