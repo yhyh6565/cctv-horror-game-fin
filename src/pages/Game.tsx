@@ -1,3 +1,5 @@
+import GameScene from '../components/scene/GameScene'
+
 export default function Game() {
-  return <div className="w-screen h-screen bg-black" />
+  return <GameScene />
 }
