@@ -8,6 +8,8 @@ import CctvFilter from './CctvFilter'
 import ScenePlayer from './ScenePlayer'
 import WinCutscene from './WinCutscene'
 import BadEndingCutscene from './BadEndingCutscene'
+import DeadEndingCutscene from './DeadEndingCutscene'
+import JumpScareCutscene from './JumpScareCutscene'
 import FloorDisplay from '../ui/FloorDisplay'
 import GestureOverlay from '../ui/GestureOverlay'
 import FrostWipe from '../interaction/FrostWipe'
@@ -207,6 +209,12 @@ export default function GameScene() {
       {scene === 'BAD_ENDING' && (
         <BadEndingCutscene onComplete={() => {}} />
       )}
+
+      {/* Dead Ending (Phase 2 timer expires) */}
+      {scene === 'DEAD_ENDING' && <DeadEndingCutscene />}
+
+      {/* Jump Scare (hand lost 5+ seconds) */}
+      {scene === 'JUMP_SCARE' && <JumpScareCutscene />}
 
       {/* ESCAPE_FROST: frost wipe interaction */}
       {scene === 'ESCAPE_FROST' && (
