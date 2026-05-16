@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { GameState, SceneId, Gesture } from '../types/game'
+import type { GameState, SceneId, Gesture } from '../types/game'
 
 const GHOST_QUESTIONS = ['이름이 뭐야?', '생일이 언제야?', '지금 무서워?']
 

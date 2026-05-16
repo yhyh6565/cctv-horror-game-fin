@@ -1,4 +1,4 @@
-import { TextLineType } from '../types/game'
+import type { TextLineType } from '../types/game'
 
 export interface ScriptLine {
   type: TextLineType
