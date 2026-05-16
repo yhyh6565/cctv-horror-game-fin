@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useHandTracking } from '../../hooks/useHandTracking'
+import { useSoundManager } from '../../hooks/useSoundManager'
 import type { Gesture } from '../../types/game'
 import Background from './Background'
 import GhostSilhouette from './GhostSilhouette'
@@ -29,6 +30,7 @@ const PHASE1_PARAMS = [
 export default function GameScene() {
   const { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal } = useGameState()
   const { scene, phase1 } = state
+  const { play, stop } = useSoundManager()
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [currentGesture] = useState<Gesture>('none')
@@ -37,6 +39,7 @@ export default function GameScene() {
   const [palmX, setPalmX] = useState<number | null>(null)
   const [isPointing, setIsPointing] = useState(false)
   const insightShownRef = useRef(false)
+  const prevLossesRef = useRef(0)
   const [showInsight, setShowInsight] = useState(false)
   const [llmAnswer, setLlmAnswer] = useState<string | null>(null)
   const [revealDone, setRevealDone] = useState(false)
@@ -68,6 +71,31 @@ export default function GameScene() {
     onPointing: (p) => setIsPointing(p),
     onPalmX: (x) => setPalmX(x),
   })
+
+  // Scene-based sound triggers
+  useEffect(() => {
+    if (scene === 'PHASE_1_RPS') play('elevator_loop')
+    if (scene === 'PHASE_2_ENTRY') { stop('elevator_loop'); play('glitch') }
+    if (scene === 'WIN_CUTSCENE') play('mirror_bang')
+    if (scene === 'BAD_ENDING') play('bad_drone')
+    if (scene === 'DEAD_ENDING') play('dead_sting')
+    if (scene === 'ESCAPE_HOLD') play('whisper')
+    if (scene === 'TRUE_ENDING') play('whiteout')
+    if (scene === 'JUMP_SCARE') play('jumpscare')
+  }, [scene]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Phase 1 loss sound
+  useEffect(() => {
+    if (phase1.losses > prevLossesRef.current) {
+      play('door_creak')
+      prevLossesRef.current = phase1.losses
+    }
+  }, [phase1.losses]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Phase 2 signal sound
+  useEffect(() => {
+    if (state.phase2SignalActive) play('ghost_signal')
+  }, [state.phase2SignalActive]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Phase 2 signal tick (rAF loop)
   useEffect(() => {
