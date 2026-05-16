@@ -10,6 +10,7 @@ import WinCutscene from './WinCutscene'
 import BadEndingCutscene from './BadEndingCutscene'
 import FloorDisplay from '../ui/FloorDisplay'
 import GestureOverlay from '../ui/GestureOverlay'
+import FrostWipe from '../interaction/FrostWipe'
 
 
 const PHASE1_PARAMS = [
@@ -56,7 +57,7 @@ export default function GameScene() {
       if (scene === 'PHASE_1_RPS') submitPhase1Gesture(g)
       if (scene === 'PHASE_2_RPS') submitPhase2Gesture(g)
     },
-    onHandLost: updateHandLost,
+    onHandLost: (s) => { setPalmX(null); updateHandLost(s) },
     onPointing: (p) => setIsPointing(p),
     onPalmX: (x) => setPalmX(x),
   })
@@ -106,8 +107,7 @@ export default function GameScene() {
     else if (scene === 'WIN_CUTSCENE') goTo('ESCAPE_FROST')
   }
 
-  // suppress unused var warnings for palmX and isPointing (used by hand tracking callbacks)
-  void palmX
+  // suppress unused var warnings for isPointing (used by hand tracking callbacks)
   void isPointing
 
   if (scene === 'IDLE') {
@@ -205,6 +205,14 @@ export default function GameScene() {
       {/* Bad Ending */}
       {scene === 'BAD_ENDING' && (
         <BadEndingCutscene onComplete={() => {}} />
+      )}
+
+      {/* ESCAPE_FROST: frost wipe interaction */}
+      {scene === 'ESCAPE_FROST' && (
+        <>
+          <ScenePlayer sceneKey="ESCAPE_FROST" onComplete={() => {}} />
+          <FrostWipe palmX={palmX} onComplete={() => goTo('ESCAPE_HOLD')} />
+        </>
       )}
     </div>
   )
