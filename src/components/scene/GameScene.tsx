@@ -11,6 +11,7 @@ import BadEndingCutscene from './BadEndingCutscene'
 import FloorDisplay from '../ui/FloorDisplay'
 import GestureOverlay from '../ui/GestureOverlay'
 import FrostWipe from '../interaction/FrostWipe'
+import HoldButton from '../interaction/HoldButton'
 
 
 const PHASE1_PARAMS = [
@@ -105,9 +106,6 @@ export default function GameScene() {
     else if (scene === 'PHASE_2_ENTRY') goTo('PHASE_2_RPS')
     else if (scene === 'PHASE_2_QUESTION') goTo('PHASE_2_RPS')
   }
-
-  // suppress unused var warnings for isPointing (used by hand tracking callbacks)
-  void isPointing
 
   if (scene === 'IDLE') {
     return (
@@ -211,6 +209,18 @@ export default function GameScene() {
         <>
           <ScenePlayer sceneKey="ESCAPE_FROST" onComplete={() => {}} />
           <FrostWipe palmX={palmX} onComplete={() => goTo('ESCAPE_HOLD')} />
+        </>
+      )}
+
+      {/* ESCAPE_HOLD: index finger 3s hold */}
+      {scene === 'ESCAPE_HOLD' && (
+        <>
+          <ScenePlayer sceneKey="ESCAPE_HOLD" onComplete={() => {}} />
+          <HoldButton
+            isPointing={isPointing}
+            onComplete={() => goTo('TRUE_ENDING')}
+            onFail={() => goTo('BAD_ENDING')}
+          />
         </>
       )}
     </div>
