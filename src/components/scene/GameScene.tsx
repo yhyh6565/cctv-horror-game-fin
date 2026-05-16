@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { useGameState } from '../../hooks/useGameState'
 import { useHandTracking } from '../../hooks/useHandTracking'
+import { useFaceTracking } from '../../hooks/useFaceTracking'
 import { useSoundManager } from '../../hooks/useSoundManager'
 import type { Gesture } from '../../types/game'
 import Background from './Background'
@@ -33,6 +34,7 @@ export default function GameScene() {
   const { play, stop } = useSoundManager()
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const faceOffsetRef = useFaceTracking(videoRef)
   const [currentGesture] = useState<Gesture>('none')
   const [holdProgress, setHoldProgress] = useState(0)
   const holdStartRef = useRef<number | null>(null)
@@ -166,6 +168,7 @@ export default function GameScene() {
       <Background
         image={isPhase2 ? 'bg_4' : p1.bg}
         brightness={isPhase2 ? 0.3 : 1}
+        faceOffsetRef={faceOffsetRef}
       />
 
       {/* Layer 20: CCTV 필터 */}
