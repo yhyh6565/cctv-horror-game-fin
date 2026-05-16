@@ -34,4 +34,6 @@ export interface GameState {
   phase2: Phase2State
   handLostSeconds: number
   pendingQuestion: string | null  // Phase 2 귀신 질문
+  phase2SignalActive: boolean
+  phase2SignalMs: number  // remaining ms for Phase 2 signal window (1500 → 0)
 }

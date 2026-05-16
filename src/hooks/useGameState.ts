@@ -27,6 +27,8 @@ const INITIAL_STATE: GameState = {
   phase2: { round: 1, losses: 0, questionsAnswered: 0, insightTriggered: false },
   handLostSeconds: 0,
   pendingQuestion: null,
+  phase2SignalActive: false,
+  phase2SignalMs: 0,
 }
 
 export function useGameState() {
@@ -93,5 +95,18 @@ export function useGameState() {
 
   const isDeadEndingRoll = useCallback(() => Math.random() < 0.1, [])
 
-  return { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, isDeadEndingRoll }
+  const startPhase2Signal = useCallback(() => {
+    advance({ phase2SignalActive: true, phase2SignalMs: 1500 })
+  }, [advance])
+
+  const tickPhase2Signal = useCallback((deltaMs: number) => {
+    setState(s => {
+      if (!s.phase2SignalActive) return s
+      const remaining = s.phase2SignalMs - deltaMs
+      if (remaining <= 0) return { ...s, phase2SignalActive: false, phase2SignalMs: 0, scene: 'DEAD_ENDING' }
+      return { ...s, phase2SignalMs: remaining }
+    })
+  }, [])
+
+  return { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, isDeadEndingRoll, startPhase2Signal, tickPhase2Signal }
 }
