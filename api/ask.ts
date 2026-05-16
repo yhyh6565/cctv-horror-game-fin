@@ -10,8 +10,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const { question } = req.body as { question: string }
-  if (!question || typeof question !== 'string') {
-    return res.status(400).json({ error: 'question required' })
+  if (!question || typeof question !== 'string' || question.length > 500) {
+    return res.status(400).json({ error: 'question required or too long' })
   }
 
   const apiKey = process.env.GROQ_API_KEY
@@ -38,6 +38,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const answer = data.choices?.[0]?.message?.content ?? '알 수 없다.'
     return res.status(200).json({ answer })
   } catch {
-    return res.status(200).json({ answer: '알 수 없다.' })
+    return res.status(500).json({ answer: '알 수 없다.' })
   }
 }
