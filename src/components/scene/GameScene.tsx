@@ -18,6 +18,10 @@ import FrostWipe from '../interaction/FrostWipe'
 import HoldButton from '../interaction/HoldButton'
 import TextBox from '../ui/TextBox'
 import QuestionInput from '../interaction/QuestionInput'
+import RpsResultOverlay from './RpsResultOverlay'
+import ChoiceInput from '../interaction/ChoiceInput'
+import { getGhostQuestion } from '../../data/ghostQuestions'
+import type { GhostQuestion } from '../../data/ghostQuestions'
 
 
 const PHASE1_PARAMS = [
@@ -29,7 +33,7 @@ const PHASE1_PARAMS = [
 ]
 
 export default function GameScene() {
-  const { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal } = useGameState()
+  const { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal, setReaction } = useGameState()
   const { scene, phase1 } = state
   const { play, stop } = useSoundManager()
 
@@ -45,6 +49,27 @@ export default function GameScene() {
   const [showInsight, setShowInsight] = useState(false)
   const [llmAnswer, setLlmAnswer] = useState<string | null>(null)
   const [revealDone, setRevealDone] = useState(false)
+
+  // RPS 결과 오버레이
+  const [rpsOverlay, setRpsOverlay] = useState<{
+    playerGesture: Gesture
+    result: 'win' | 'loss' | 'tie'
+    phase: 'phase1' | 'phase2'
+    pendingScene: () => void
+  } | null>(null)
+
+  // 손 안내 (첫 진입 시 한 번만)
+  const handGuideShownRef = useRef(false)
+  const [showHandGuide, setShowHandGuide] = useState(false)
+
+  // 프레임 침입 (BAD_ENDING 직전)
+  const [frameIntrude, setFrameIntrude] = useState(false)
+
+  // 현재 귀신 질문 데이터
+  const currentGhostQuestion: GhostQuestion | null =
+    state.pendingQuestion != null
+      ? getGhostQuestion(state.phase2.questionsAnswered - 1) ?? null
+      : null
 
   // Track hold progress for UI display
   useEffect(() => {
@@ -63,13 +88,69 @@ export default function GameScene() {
     return () => clearInterval(interval)
   }, [currentGesture])
 
+  // PHASE_1_RPS 첫 진입 시 손 안내 표시
+  useEffect(() => {
+    if (scene === 'PHASE_1_RPS' && !handGuideShownRef.current) {
+      setShowHandGuide(true)
+    }
+  }, [scene])
+
+  // PHASE_2_REACTION 자동 전환
+  useEffect(() => {
+    if (scene !== 'PHASE_2_REACTION') return
+    const t = setTimeout(() => {
+      setReaction(null)
+      goTo('PHASE_2_RPS')
+    }, 1500)
+    return () => clearTimeout(t)
+  }, [scene]) // eslint-disable-line
+
   useHandTracking({
     videoRef,
     onGesture: (g) => {
-      if (scene === 'PHASE_1_RPS') submitPhase1Gesture(g)
-      if (scene === 'PHASE_2_RPS') submitPhase2Gesture(g)
+      if (rpsOverlay !== null) return  // overlay 표시 중 입력 무시
+      if (scene === 'PHASE_1_RPS') {
+        const result: 'tie' | 'loss' = g === 'paper' ? 'tie' : 'loss'
+        setRpsOverlay({
+          playerGesture: g,
+          result,
+          phase: 'phase1',
+          pendingScene: () => submitPhase1Gesture(g),
+        })
+      }
+      if (scene === 'PHASE_2_RPS') {
+        const isScissors = g === 'scissors'
+        const round = state.phase2.round
+        const winRoll = round === 3 ? true : Math.random() < 0.2
+        const result: 'win' | 'loss' = isScissors && winRoll ? 'win' : 'loss'
+        setRpsOverlay({
+          playerGesture: g,
+          result,
+          phase: 'phase2',
+          pendingScene: () => {
+            if (result === 'win') {
+              goTo('WIN_CUTSCENE')
+            } else {
+              const newLosses = state.phase2.losses + 1
+              if (newLosses >= 3 || round >= 3) {
+                setFrameIntrude(true)
+                setTimeout(() => { setFrameIntrude(false); goTo('BAD_ENDING') }, 400)
+              } else {
+                submitPhase2Gesture(g)
+              }
+            }
+          },
+        })
+      }
     },
-    onHandLost: (s) => { setPalmX(null); updateHandLost(s) },
+    onHandLost: (s) => {
+      setPalmX(null)
+      updateHandLost(s)
+      if (s === 0 && showHandGuide) {
+        setShowHandGuide(false)
+        handGuideShownRef.current = true
+      }
+    },
     onPointing: (p) => setIsPointing(p),
     onPalmX: (x) => setPalmX(x),
   })
@@ -106,6 +187,7 @@ export default function GameScene() {
   // Phase 2 signal tick (rAF loop)
   useEffect(() => {
     if (!state.phase2SignalActive) return
+    if (rpsOverlay !== null) return  // 오버레이 중 타이머 정지
     let last = Date.now()
     let rafId: number
     const tick = () => {
@@ -116,7 +198,7 @@ export default function GameScene() {
     }
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
-  }, [state.phase2SignalActive, tickPhase2Signal])
+  }, [state.phase2SignalActive, tickPhase2Signal, rpsOverlay])
 
   // Trigger Phase 2 signal when entering PHASE_2_RPS
   useEffect(() => {
@@ -179,7 +261,13 @@ export default function GameScene() {
         <GhostSilhouette size={p1.ghostSize} opacity={p1.ghostOpacity} />
       )}
       {isPhase2 && (
-        <GhostSilhouette size={100} opacity={1} position="right" />
+        <GhostSilhouette
+          size={100}
+          opacity={1}
+          position="right"
+          approaching={scene === 'PHASE_2_RPS' && state.phase2SignalActive && rpsOverlay === null}
+          frameIntrude={frameIntrude}
+        />
       )}
 
       {/* Layer 40: 층수 표시 */}
@@ -196,21 +284,30 @@ export default function GameScene() {
           active={true}
           holdProgress={holdProgress}
           currentGesture={currentGesture}
+          handGuide={showHandGuide}
         />
       )}
 
       {/* PHASE_2_QUESTION: ghost question display */}
-      {scene === 'PHASE_2_QUESTION' && state.pendingQuestion && (
-        <div className="absolute bottom-0 left-0 right-0 z-50 p-4">
-          <div className="bg-black/80 border border-red-900 rounded p-4">
-            <p className="text-red-400 font-mono text-sm">{state.pendingQuestion}</p>
-          </div>
-          <button
-            onClick={() => goTo('PHASE_2_RPS')}
-            className="mt-2 w-full text-gray-500 text-xs py-2"
+      {scene === 'PHASE_2_QUESTION' && currentGhostQuestion && (
+        <ChoiceInput
+          question={currentGhostQuestion.question}
+          choices={currentGhostQuestion.choices}
+          onSelect={(reaction) => {
+            setReaction(reaction)
+            goTo('PHASE_2_REACTION')
+          }}
+        />
+      )}
+
+      {scene === 'PHASE_2_REACTION' && state.pendingReaction && (
+        <div className="absolute inset-0 z-50 flex items-end justify-center pb-16">
+          <p
+            className="font-mono text-gray-300 text-base tracking-wide"
+            style={{ fontStyle: 'italic' }}
           >
-            계속 →
-          </button>
+            {state.pendingReaction}
+          </p>
         </div>
       )}
 
@@ -286,6 +383,20 @@ export default function GameScene() {
       )}
       {scene === 'TRUE_ENDING' && llmAnswer && revealDone && (
         <ScenePlayer sceneKey="TRUE_ENDING" onComplete={() => {}} />
+      )}
+
+      {/* RPS 결과 오버레이 */}
+      {rpsOverlay && (
+        <RpsResultOverlay
+          playerGesture={rpsOverlay.playerGesture}
+          result={rpsOverlay.result}
+          phase={rpsOverlay.phase}
+          onDone={() => {
+            const action = rpsOverlay.pendingScene
+            setRpsOverlay(null)
+            action()
+          }}
+        />
       )}
     </div>
   )
