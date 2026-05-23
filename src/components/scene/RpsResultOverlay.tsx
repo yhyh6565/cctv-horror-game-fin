@@ -21,14 +21,14 @@ const GESTURE_KO: Record<Gesture, string> = {
 function getGhostMove(playerGesture: Gesture, result: Result, phase: Phase): string {
   if (phase === 'phase1') {
     if (result === 'tie') return '보'
-    if (playerGesture === 'rock') return '보'
-    if (playerGesture === 'scissors') return '바위'
+    if (result === 'loss' && playerGesture === 'rock') return '보'
+    if (result === 'loss' && playerGesture === 'scissors') return '바위'
     return '?'
   }
   // phase2
   if (result === 'win') return '보'
-  if (playerGesture === 'scissors') return '바위'
-  if (playerGesture === 'rock') return '보'
+  if (result === 'loss' && playerGesture === 'scissors') return '바위'
+  if (result === 'loss' && playerGesture === 'rock') return '보'
   return '???'  // paper+loss: 초자연적 승리
 }
 
