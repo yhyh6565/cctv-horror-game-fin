@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { GameState, SceneId, Gesture } from '../types/game'
 import { getGhostQuestion } from '../data/ghostQuestions'
-export { getGhostQuestion }
 
 export function resolvePhase1(gesture: Gesture): 'tie' | 'loss' {
   return gesture === 'paper' ? 'tie' : 'loss'

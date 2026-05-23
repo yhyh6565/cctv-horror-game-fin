@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { resolvePhase1, resolvePhase2, getGhostQuestion } from './useGameState'
+import { resolvePhase1, resolvePhase2 } from './useGameState'
+import { getGhostQuestion } from '../data/ghostQuestions'
 
 describe('Phase 1 RPS', () => {
   it('paper always ties', () => {
@@ -32,8 +33,8 @@ describe('Phase 2 RPS', () => {
 
 describe('Ghost questions', () => {
   it('returns question by index', () => {
-    expect(getGhostQuestion(0)).toBe('이름이 뭐야?')
-    expect(getGhostQuestion(1)).toBe('생일이 언제야?')
-    expect(getGhostQuestion(2)).toBe('지금 무서워?')
+    expect(getGhostQuestion(0)?.question).toBe('이름이 뭐야?')
+    expect(getGhostQuestion(1)?.question).toBe('생일이 언제야?')
+    expect(getGhostQuestion(2)?.question).toBe('지금 무서워?')
   })
 })
