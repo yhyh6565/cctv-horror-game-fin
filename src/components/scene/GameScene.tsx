@@ -23,7 +23,6 @@ import ChoiceInput from '../interaction/ChoiceInput'
 import { getGhostQuestion } from '../../data/ghostQuestions'
 import type { GhostQuestion } from '../../data/ghostQuestions'
 
-
 const PHASE1_PARAMS = [
   { bg: 'bg_0', ghostSize: 0, ghostOpacity: 0, floor: '1F' },
   { bg: 'bg_1', ghostSize: 45, ghostOpacity: 0.65, floor: '5F' },
@@ -32,6 +31,8 @@ const PHASE1_PARAMS = [
   { bg: 'bg_4', ghostSize: 100, ghostOpacity: 1.0, floor: '12F' },
 ]
 
+const SCENE_PLAYER_SCENES = ['SCENE_01', 'SCENE_02', 'SCENE_03', 'PHASE_2_ENTRY'] as const
+
 export default function GameScene() {
   const { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal, setReaction } = useGameState()
   const { scene, phase1 } = state
@@ -39,9 +40,6 @@ export default function GameScene() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const faceOffsetRef = useFaceTracking(videoRef)
-  const [currentGesture] = useState<Gesture>('none')
-  const [holdProgress, setHoldProgress] = useState(0)
-  const holdStartRef = useRef<number | null>(null)
   const [palmX, setPalmX] = useState<number | null>(null)
   const [isPointing, setIsPointing] = useState(false)
   const insightShownRef = useRef(false)
@@ -70,23 +68,6 @@ export default function GameScene() {
     state.pendingQuestion != null
       ? getGhostQuestion(state.phase2.questionsAnswered - 1) ?? null
       : null
-
-  // Track hold progress for UI display
-  useEffect(() => {
-    if (currentGesture === 'none') {
-      setHoldProgress(0)
-      holdStartRef.current = null
-      return
-    }
-    holdStartRef.current = Date.now()
-    const interval = setInterval(() => {
-      if (holdStartRef.current) {
-        const held = Date.now() - holdStartRef.current
-        setHoldProgress(Math.min(held / 800, 1))
-      }
-    }, 50)
-    return () => clearInterval(interval)
-  }, [currentGesture])
 
   // PHASE_1_RPS 첫 진입 시 손 안내 표시
   useEffect(() => {
@@ -182,10 +163,10 @@ export default function GameScene() {
     if (state.phase2SignalActive) play('ghost_signal')
   }, [state.phase2SignalActive]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Phase 2 signal tick (rAF loop)
+  // Phase 2 signal tick (rAF loop) — 오버레이 중 타이머 정지
   useEffect(() => {
     if (!state.phase2SignalActive) return
-    if (rpsOverlay !== null) return  // 오버레이 중 타이머 정지
+    if (rpsOverlay !== null) return
     let last = Date.now()
     let rafId: number
     const tick = () => {
@@ -203,7 +184,7 @@ export default function GameScene() {
     if (scene === 'PHASE_2_RPS') startPhase2Signal()
   }, [scene]) // eslint-disable-line
 
-  // Insight monologue logic (show when round=2, insightTriggered=true, not yet shown)
+  // Insight monologue logic
   useEffect(() => {
     if (
       scene === 'PHASE_2_RPS' &&
@@ -224,7 +205,6 @@ export default function GameScene() {
     else if (scene === 'SCENE_02') goTo('SCENE_03')
     else if (scene === 'SCENE_03') goTo('PHASE_1_RPS')
     else if (scene === 'PHASE_2_ENTRY') goTo('PHASE_2_RPS')
-    else if (scene === 'PHASE_2_QUESTION') goTo('PHASE_2_RPS')
   }
 
   if (scene === 'IDLE') {
@@ -271,22 +251,21 @@ export default function GameScene() {
       {/* Layer 40: 층수 표시 */}
       <FloorDisplay floor={p1.floor} glitch={isGlitch} />
 
-      {/* Layer 50: 텍스트 */}
-      {['SCENE_01', 'SCENE_02', 'SCENE_03', 'PHASE_2_ENTRY'].includes(scene) && (
+      {/* Layer 50: 씬 텍스트 */}
+      {(SCENE_PLAYER_SCENES as readonly string[]).includes(scene) && (
         <ScenePlayer sceneKey={scene} onComplete={handleSceneComplete} />
       )}
 
-      {/* Phase 1 RPS: GestureOverlay */}
-      {scene === 'PHASE_1_RPS' && (
+      {/* RPS 안내 */}
+      {(scene === 'PHASE_1_RPS' || (scene === 'PHASE_2_RPS' && !showInsight)) && (
         <GestureOverlay
           active={true}
-          holdProgress={holdProgress}
-          currentGesture={currentGesture}
-          handGuide={showHandGuide}
+          handGuide={scene === 'PHASE_1_RPS' ? showHandGuide : undefined}
+          countdownMs={scene === 'PHASE_2_RPS' && state.phase2SignalActive ? state.phase2SignalMs : undefined}
         />
       )}
 
-      {/* PHASE_2_QUESTION: ghost question display */}
+      {/* PHASE_2_QUESTION: 귀신 질문 선택지 */}
       {scene === 'PHASE_2_QUESTION' && currentGhostQuestion && (
         <ChoiceInput
           question={currentGhostQuestion.question}
@@ -298,12 +277,10 @@ export default function GameScene() {
         />
       )}
 
+      {/* PHASE_2_REACTION: 선택 후 내면 독백 */}
       {scene === 'PHASE_2_REACTION' && state.pendingReaction && (
         <div className="absolute inset-0 z-50 flex items-end justify-center pb-16">
-          <p
-            className="font-mono text-gray-300 text-base tracking-wide"
-            style={{ fontStyle: 'italic' }}
-          >
+          <p className="font-mono text-gray-300 text-base tracking-wide italic">
             {state.pendingReaction}
           </p>
         </div>
@@ -317,16 +294,6 @@ export default function GameScene() {
             insightShownRef.current = true
             setShowInsight(false)
           }}
-        />
-      )}
-
-      {/* Phase 2 RPS: GestureOverlay with countdown */}
-      {scene === 'PHASE_2_RPS' && !showInsight && (
-        <GestureOverlay
-          active={true}
-          holdProgress={holdProgress}
-          currentGesture={currentGesture}
-          countdownMs={state.phase2SignalActive ? state.phase2SignalMs : undefined}
         />
       )}
 

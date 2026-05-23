@@ -93,8 +93,6 @@ export function useGameState() {
     advance({ pendingReaction: reaction })
   }, [advance])
 
-  const isDeadEndingRoll = useCallback(() => Math.random() < 0.1, [])
-
   const startPhase2Signal = useCallback(() => {
     advance({ phase2SignalActive: true, phase2SignalMs: 1500 })
   }, [advance])
@@ -108,5 +106,5 @@ export function useGameState() {
     })
   }, [])
 
-  return { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, isDeadEndingRoll, startPhase2Signal, tickPhase2Signal, setReaction }
+  return { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal, setReaction }
 }
