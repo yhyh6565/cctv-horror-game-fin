@@ -1,11 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { GameState, SceneId, Gesture } from '../types/game'
-
-const GHOST_QUESTIONS = ['이름이 뭐야?', '생일이 언제야?', '지금 무서워?']
-
-export function getGhostQuestion(index: number): string {
-  return GHOST_QUESTIONS[index] ?? ''
-}
+import { getGhostQuestion } from '../data/ghostQuestions'
+export { getGhostQuestion }
 
 export function resolvePhase1(gesture: Gesture): 'tie' | 'loss' {
   return gesture === 'paper' ? 'tie' : 'loss'
@@ -27,6 +23,7 @@ const INITIAL_STATE: GameState = {
   phase2: { round: 1, losses: 0, questionsAnswered: 0, insightTriggered: false },
   handLostSeconds: 0,
   pendingQuestion: null,
+  pendingReaction: null,
   phase2SignalActive: false,
   phase2SignalMs: 0,
 }
@@ -80,7 +77,7 @@ export function useGameState() {
           questionsAnswered: newQA,
           insightTriggered: insightTriggered || triggerInsight,
         },
-        pendingQuestion: getGhostQuestion(questionsAnswered),
+        pendingQuestion: getGhostQuestion(questionsAnswered)?.question ?? null,
         scene: 'PHASE_2_QUESTION',
       }
     })
@@ -92,6 +89,10 @@ export function useGameState() {
       return { ...s, handLostSeconds: seconds }
     })
   }, [])
+
+  const setReaction = useCallback((reaction: string | null) => {
+    advance({ pendingReaction: reaction })
+  }, [advance])
 
   const isDeadEndingRoll = useCallback(() => Math.random() < 0.1, [])
 
@@ -108,5 +109,5 @@ export function useGameState() {
     })
   }, [])
 
-  return { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, isDeadEndingRoll, startPhase2Signal, tickPhase2Signal }
+  return { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, isDeadEndingRoll, startPhase2Signal, tickPhase2Signal, setReaction }
 }

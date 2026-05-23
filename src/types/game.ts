@@ -5,6 +5,7 @@ export type SceneId =
   | 'PHASE_2_ENTRY'
   | 'PHASE_2_RPS'
   | 'PHASE_2_QUESTION'
+  | 'PHASE_2_REACTION'
   | 'WIN_CUTSCENE'
   | 'BAD_ENDING'
   | 'DEAD_ENDING'
@@ -34,6 +35,7 @@ export interface GameState {
   phase2: Phase2State
   handLostSeconds: number
   pendingQuestion: string | null  // Phase 2 귀신 질문
+  pendingReaction: string | null
   phase2SignalActive: boolean
   phase2SignalMs: number  // remaining ms for Phase 2 signal window (1500 → 0)
 }
