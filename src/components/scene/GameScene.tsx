@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { useGameState } from '../../hooks/useGameState'
+import { useGameState, resolvePhase2 } from '../../hooks/useGameState'
 import { useHandTracking } from '../../hooks/useHandTracking'
 import { useFaceTracking } from '../../hooks/useFaceTracking'
 import { useSoundManager } from '../../hooks/useSoundManager'
@@ -119,24 +119,22 @@ export default function GameScene() {
         })
       }
       if (scene === 'PHASE_2_RPS') {
-        const isScissors = g === 'scissors'
         const round = state.phase2.round
-        const winRoll = round === 3 ? true : Math.random() < 0.2
-        const result: 'win' | 'loss' = isScissors && winRoll ? 'win' : 'loss'
+        const result = resolvePhase2(g, round, state.phase2.insightTriggered)
         setRpsOverlay({
           playerGesture: g,
           result,
           phase: 'phase2',
           pendingScene: () => {
             if (result === 'win') {
-              goTo('WIN_CUTSCENE')
+              submitPhase2Gesture(g, result)
             } else {
               const newLosses = state.phase2.losses + 1
               if (newLosses >= 3 || round >= 3) {
                 setFrameIntrude(true)
-                setTimeout(() => { setFrameIntrude(false); goTo('BAD_ENDING') }, 400)
+                setTimeout(() => { setFrameIntrude(false); submitPhase2Gesture(g, result) }, 400)
               } else {
-                submitPhase2Gesture(g)
+                submitPhase2Gesture(g, result)
               }
             }
           },

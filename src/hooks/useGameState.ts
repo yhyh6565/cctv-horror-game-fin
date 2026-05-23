@@ -50,10 +50,10 @@ export function useGameState() {
     })
   }, [])
 
-  const submitPhase2Gesture = useCallback((gesture: Gesture) => {
+  const submitPhase2Gesture = useCallback((gesture: Gesture, precomputedResult?: 'win' | 'loss') => {
     setState(s => {
       const { round, losses, questionsAnswered, insightTriggered } = s.phase2
-      const result = resolvePhase2(gesture, round, insightTriggered)
+      const result = precomputedResult ?? resolvePhase2(gesture, round, insightTriggered)
 
       if (result === 'win') {
         return { ...s, scene: 'WIN_CUTSCENE' }
