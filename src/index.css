@@ -2,3 +2,12 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #000; overflow: hidden; }
+
+@keyframes ghostApproach {
+  from {
+    transform: scale(1.0) translateY(0);
+  }
+  to {
+    transform: scale(1.04) translateY(-8px);
+  }
+}
