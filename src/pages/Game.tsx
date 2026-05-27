@@ -1,5 +1,9 @@
 import GameScene from '../components/scene/GameScene'
 
-export default function Game() {
-  return <GameScene />
+interface Props {
+  onRetry: () => void
+}
+
+export default function Game({ onRetry }: Props) {
+  return <GameScene onRetry={onRetry} />
 }
