@@ -12,6 +12,7 @@ import WinCutscene from './WinCutscene'
 import BadEndingCutscene from './BadEndingCutscene'
 import DeadEndingCutscene from './DeadEndingCutscene'
 import JumpScareCutscene from './JumpScareCutscene'
+import EndingScreen from './EndingScreen'
 import FloorDisplay from '../ui/FloorDisplay'
 import GestureOverlay from '../ui/GestureOverlay'
 import FrostWipe from '../interaction/FrostWipe'
@@ -33,7 +34,11 @@ const PHASE1_PARAMS = [
 
 const SCENE_PLAYER_SCENES = ['SCENE_01', 'SCENE_02', 'SCENE_03', 'PHASE_2_ENTRY'] as const
 
-export default function GameScene() {
+interface Props {
+  onRetry: () => void
+}
+
+export default function GameScene({ onRetry }: Props) {
   const { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal, setReaction } = useGameState()
   const { scene, phase1 } = state
   const { play, stop } = useSoundManager()
@@ -304,14 +309,29 @@ export default function GameScene() {
 
       {/* Bad Ending */}
       {scene === 'BAD_ENDING' && (
-        <BadEndingCutscene onComplete={() => {}} />
+        <BadEndingCutscene onComplete={() => goTo('ENDING_SCREEN_BAD')} />
       )}
 
       {/* Dead Ending (Phase 2 timer expires) */}
-      {scene === 'DEAD_ENDING' && <DeadEndingCutscene />}
+      {scene === 'DEAD_ENDING' && (
+        <DeadEndingCutscene onComplete={() => goTo('ENDING_SCREEN_DEAD')} />
+      )}
 
       {/* Jump Scare (hand lost 5+ seconds) */}
-      {scene === 'JUMP_SCARE' && <JumpScareCutscene />}
+      {scene === 'JUMP_SCARE' && (
+        <JumpScareCutscene onComplete={() => goTo('ENDING_SCREEN_JUMP')} />
+      )}
+
+      {/* Ending Screens */}
+      {scene === 'ENDING_SCREEN_BAD' && (
+        <EndingScreen endingType="bad" onRetry={onRetry} />
+      )}
+      {scene === 'ENDING_SCREEN_DEAD' && (
+        <EndingScreen endingType="dead" onRetry={onRetry} />
+      )}
+      {scene === 'ENDING_SCREEN_JUMP' && (
+        <EndingScreen endingType="jump" onRetry={onRetry} />
+      )}
 
       {/* ESCAPE_FROST: frost wipe interaction */}
       {scene === 'ESCAPE_FROST' && (
