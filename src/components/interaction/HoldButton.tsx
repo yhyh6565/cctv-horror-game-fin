@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
 interface Props {
-  isPointing: boolean   // 검지 펴기 감지 여부
-  holdDurationMs?: number  // default 3000
+  isPointing: boolean
+  holdDurationMs?: number
   onComplete: () => void
   onFail: () => void
 }
@@ -16,23 +16,35 @@ export default function HoldButton({ isPointing, holdDurationMs = 3000, onComple
   useEffect(() => {
     if (completedRef.current || failedRef.current) return
 
-    if (isPointing) {
-      if (!startRef.current) startRef.current = Date.now()
+    if (!isPointing) {
+      if (startRef.current !== null) {
+        failedRef.current = true
+        startRef.current = null
+        setProgress(0)
+        onFail()
+      }
+      return
+    }
+
+    // isPointing === true: rAF 루프 시작
+    if (!startRef.current) startRef.current = Date.now()
+
+    let rafId: number
+    const tick = () => {
+      if (!startRef.current || completedRef.current || failedRef.current) return
       const elapsed = Date.now() - startRef.current
       const pct = Math.min(elapsed / holdDurationMs, 1)
       setProgress(pct)
       if (pct >= 1) {
         completedRef.current = true
         onComplete()
+        return
       }
-    } else {
-      if (startRef.current !== null) {
-        // Released mid-hold = fail
-        failedRef.current = true
-        onFail()
-      }
+      rafId = requestAnimationFrame(tick)
     }
-  })
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
+  }, [isPointing, holdDurationMs, onComplete, onFail])
 
   return (
     <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2">
