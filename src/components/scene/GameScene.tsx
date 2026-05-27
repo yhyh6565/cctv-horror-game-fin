@@ -38,6 +38,21 @@ interface Props {
   onRetry: () => void
 }
 
+function ReactionBar() {
+  const [width, setWidth] = useState(100)
+  useEffect(() => {
+    requestAnimationFrame(() => setWidth(0))
+  }, [])
+  return (
+    <div className="w-full h-0.5 bg-gray-800">
+      <div
+        className="h-full bg-gray-600"
+        style={{ width: `${width}%`, transition: 'width 1.5s linear' }}
+      />
+    </div>
+  )
+}
+
 export default function GameScene({ onRetry }: Props) {
   const { state, goTo, submitPhase1Gesture, submitPhase2Gesture, updateHandLost, startPhase2Signal, tickPhase2Signal, setReaction } = useGameState()
   const { scene, phase1 } = state
@@ -64,6 +79,7 @@ export default function GameScene({ onRetry }: Props) {
   // 손 안내 (첫 진입 시 한 번만)
   const handGuideShownRef = useRef(false)
   const [showHandGuide, setShowHandGuide] = useState(false)
+  const [inputLocked, setInputLocked] = useState(false)
 
   // 프레임 침입 (BAD_ENDING 직전)
   const [frameIntrude, setFrameIntrude] = useState(false)
@@ -94,7 +110,11 @@ export default function GameScene({ onRetry }: Props) {
   useHandTracking({
     videoRef,
     onGesture: (g) => {
-      if (rpsOverlay !== null) return  // overlay 표시 중 입력 무시
+      if (rpsOverlay !== null) {
+        setInputLocked(true)
+        setTimeout(() => setInputLocked(false), 400)
+        return
+      }
       if (scene === 'PHASE_2_RPS' && !state.phase2SignalActive) return
       if (scene === 'PHASE_1_RPS') {
         const result: 'tie' | 'loss' = g === 'paper' ? 'tie' : 'loss'
@@ -266,6 +286,7 @@ export default function GameScene({ onRetry }: Props) {
       {(scene === 'PHASE_1_RPS' || (scene === 'PHASE_2_RPS' && !showInsight)) && (
         <GestureOverlay
           active={true}
+          phase2Mode={scene === 'PHASE_2_RPS'}
           handGuide={scene === 'PHASE_1_RPS' ? showHandGuide : undefined}
           countdownMs={scene === 'PHASE_2_RPS' && state.phase2SignalActive ? state.phase2SignalMs : undefined}
         />
@@ -285,10 +306,11 @@ export default function GameScene({ onRetry }: Props) {
 
       {/* PHASE_2_REACTION: 선택 후 내면 독백 */}
       {scene === 'PHASE_2_REACTION' && state.pendingReaction && (
-        <div className="absolute inset-0 z-50 flex items-end justify-center pb-16">
-          <p className="font-mono text-gray-300 text-base tracking-wide italic">
+        <div className="absolute inset-0 z-50 flex flex-col items-end justify-end pb-16 px-8 gap-3">
+          <p className="font-mono text-gray-300 text-base tracking-wide italic self-center">
             {state.pendingReaction}
           </p>
+          <ReactionBar />
         </div>
       )}
 
@@ -369,6 +391,14 @@ export default function GameScene({ onRetry }: Props) {
       )}
       {scene === 'TRUE_ENDING' && llmAnswer && revealDone && (
         <ScenePlayer sceneKey="TRUE_ENDING" onComplete={() => {}} />
+      )}
+
+      {/* 입력 묵살 피드백 */}
+      {inputLocked && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60]
+                        text-white text-2xl opacity-60 pointer-events-none select-none">
+          ⏳
+        </div>
       )}
 
       {/* RPS 결과 오버레이 */}
