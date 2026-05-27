@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { resolvePhase1, resolvePhase2 } from './useGameState'
+import { renderHook, act } from '@testing-library/react'
+import { resolvePhase1, resolvePhase2, useGameState } from './useGameState'
 import { getGhostQuestion } from '../data/ghostQuestions'
 
 describe('Phase 1 RPS', () => {
@@ -28,6 +29,23 @@ describe('Phase 2 RPS', () => {
     // 결과는 'win' 또는 'loss' 중 하나
     const result = resolvePhase2('scissors', 1, false)
     expect(['win', 'loss']).toContain(result)
+  })
+})
+
+describe('Phase 2 timer stops on question', () => {
+  it('phase2SignalActive is false after submitPhase2Gesture loss', () => {
+    const { result } = renderHook(() => useGameState())
+
+    act(() => { result.current.goTo('PHASE_2_RPS') })
+    act(() => { result.current.startPhase2Signal() })
+
+    expect(result.current.state.phase2SignalActive).toBe(true)
+
+    act(() => { result.current.submitPhase2Gesture('rock', 'loss') })
+
+    expect(result.current.state.scene).toBe('PHASE_2_QUESTION')
+    expect(result.current.state.phase2SignalActive).toBe(false)
+    expect(result.current.state.phase2SignalMs).toBe(0)
   })
 })
 

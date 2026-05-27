@@ -78,6 +78,8 @@ export function useGameState() {
         },
         pendingQuestion: getGhostQuestion(questionsAnswered)?.question ?? null,
         scene: 'PHASE_2_QUESTION',
+        phase2SignalActive: false,
+        phase2SignalMs: 0,
       }
     })
   }, [])
