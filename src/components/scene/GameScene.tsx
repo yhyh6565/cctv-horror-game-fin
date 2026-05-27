@@ -95,6 +95,7 @@ export default function GameScene({ onRetry }: Props) {
     videoRef,
     onGesture: (g) => {
       if (rpsOverlay !== null) return  // overlay 표시 중 입력 무시
+      if (scene === 'PHASE_2_RPS' && !state.phase2SignalActive) return
       if (scene === 'PHASE_1_RPS') {
         const result: 'tie' | 'loss' = g === 'paper' ? 'tie' : 'loss'
         setRpsOverlay({
