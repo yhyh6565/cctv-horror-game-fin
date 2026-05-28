@@ -2,6 +2,7 @@
 
 ## Session start
 At the start of every session, read HANDOFF.md before doing anything else.
+After reading, briefly confirm: state the project name, last session date, and what's next (1-2 lines max). Example: "mirror-vn 맥락 확인 — 마지막 세션 2026-05-27, 다음: 엔딩 스크린 UX 테스트"
 
 ## PRD
 Location: docs/PRD.md (not yet created — create before next implementation session)
