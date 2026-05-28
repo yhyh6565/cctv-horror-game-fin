@@ -1,5 +1,8 @@
 # mirror-vn — Claude Instructions
 
+## Session start
+At the start of every session, read HANDOFF.md before doing anything else.
+
 ## PRD
 Location: docs/PRD.md (not yet created — create before next implementation session)
 Last reviewed: —
