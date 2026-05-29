@@ -9,10 +9,10 @@ const SFX_FILES = {
   mirror_shatter: '/sounds/mirror_shatter.mp3',
   ghost_laugh: '/sounds/ghost_laugh.mp3',
   jumpscare: '/sounds/jumpscare.mp3',
-  whisper: '/sounds/whisper.mp3',
+  whisper: '/sounds/whisper.wav',
   glitch: '/sounds/glitch.mp3',
   dead_sting: '/sounds/dead_sting.mp3',
-  bad_drone: '/sounds/bad_drone.mp3',
+  bad_drone: '/sounds/bad_drone.ogg',
   whiteout: '/sounds/whiteout.mp3',
 } as const
 
