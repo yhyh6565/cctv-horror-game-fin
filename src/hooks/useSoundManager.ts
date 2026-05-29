@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Howl } from 'howler'
 
 const SFX_FILES = {
@@ -21,6 +21,12 @@ type SfxKey = keyof typeof SFX_FILES
 export function useSoundManager() {
   const sounds = useRef<Partial<Record<SfxKey, Howl>>>({})
   const muted = useRef(false)
+
+  useEffect(() => {
+    return () => {
+      Object.values(sounds.current).forEach(h => { h?.stop(); h?.unload() })
+    }
+  }, [])
 
   const play = useCallback((key: SfxKey) => {
     if (muted.current) return

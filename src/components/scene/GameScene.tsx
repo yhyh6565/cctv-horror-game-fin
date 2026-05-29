@@ -63,8 +63,12 @@ export default function GameScene({ onRetry }: Props) {
   const [palmX, setPalmX] = useState<number | null>(null)
   const [isPointing, setIsPointing] = useState(false)
   const insightShownRef = useRef(false)
+  const round2ConfirmShownRef = useRef(false)
+  const round3SetupShownRef = useRef(false)
   const prevLossesRef = useRef(0)
   const [showInsight, setShowInsight] = useState(false)
+  const [showRound2Confirm, setShowRound2Confirm] = useState(false)
+  const [showRound3Setup, setShowRound3Setup] = useState(false)
   const [llmAnswer, setLlmAnswer] = useState<string | null>(null)
   const [revealDone, setRevealDone] = useState(false)
 
@@ -222,6 +226,21 @@ export default function GameScene({ onRetry }: Props) {
     }
   }, [scene, state.phase2.round, state.phase2.insightTriggered])
 
+  // Round 2 confirm ("역시. 귀신은 가위를 못 낸다.") — insight 확인 후 round 2 결과 직후
+  useEffect(() => {
+    if (
+      scene === 'PHASE_2_RPS' &&
+      state.phase2.round === 3 &&
+      state.phase2.insightTriggered &&
+      !round2ConfirmShownRef.current
+    ) {
+      setShowRound2Confirm(true)
+    }
+  }, [scene, state.phase2.round, state.phase2.insightTriggered])
+
+  // Round 3 setup ("펜과 고무줄을 꺼냈다.") — round 2 confirm 완료 후
+  // round3SetupShownRef로 한 번만 표시
+
   const p1 = PHASE1_PARAMS[Math.min(phase1.losses, 4)]
   const isPhase2 = scene.startsWith('PHASE_2') || scene === 'WIN_CUTSCENE'
   const isGlitch = scene === 'PHASE_2_ENTRY'
@@ -325,6 +344,29 @@ export default function GameScene({ onRetry }: Props) {
         />
       )}
 
+      {/* Round 2 confirm: "역시. 귀신은 가위를 못 낸다." */}
+      {scene === 'PHASE_2_RPS' && showRound2Confirm && (
+        <ScenePlayer
+          sceneKey="PHASE2_ROUND2_TIE"
+          onComplete={() => {
+            round2ConfirmShownRef.current = true
+            setShowRound2Confirm(false)
+            setShowRound3Setup(true)
+          }}
+        />
+      )}
+
+      {/* Round 3 setup: "펜과 고무줄을 꺼냈다." */}
+      {scene === 'PHASE_2_RPS' && showRound3Setup && (
+        <ScenePlayer
+          sceneKey="PHASE2_ROUND3_SETUP"
+          onComplete={() => {
+            round3SetupShownRef.current = true
+            setShowRound3Setup(false)
+          }}
+        />
+      )}
+
       {/* Win Cutscene */}
       {scene === 'WIN_CUTSCENE' && (
         <WinCutscene onComplete={() => goTo('ESCAPE_FROST')} />
@@ -390,7 +432,10 @@ export default function GameScene({ onRetry }: Props) {
         />
       )}
       {scene === 'TRUE_ENDING' && llmAnswer && revealDone && (
-        <ScenePlayer sceneKey="TRUE_ENDING" onComplete={() => {}} />
+        <ScenePlayer sceneKey="TRUE_ENDING" onComplete={() => goTo('ENDING_SCREEN_TRUE')} />
+      )}
+      {scene === 'ENDING_SCREEN_TRUE' && (
+        <EndingScreen endingType="true" onRetry={onRetry} />
       )}
 
       {/* 입력 묵살 피드백 */}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-type EndingType = 'bad' | 'dead' | 'jump'
+type EndingType = 'bad' | 'dead' | 'jump' | 'true'
 
 interface Props {
   endingType: EndingType
@@ -8,6 +8,16 @@ interface Props {
 }
 
 const TRANSCRIPTS: Record<EndingType, string> = {
+  true: `탐사기록 #47 — Qterw-D-718
+담당: 김솔음 (현장탐사팀 D조)
+
+거울 속 존재와의 가위바위보 완료. 판정승 확정.
+거울 균열 확인됨. 존재 봉인 해제 신호 감지됨.
+직원 교신 정상 복귀.
+
+[ 의식 성공적으로 종료됨 ]
+[ 꿈결 수집기 자동 회수 완료 ]`,
+
   bad: `탐사기록 #47 — Qterw-D-718
 담당: 김솔음 (현장탐사팀 D조)
 

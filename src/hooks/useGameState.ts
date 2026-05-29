@@ -84,12 +84,20 @@ export function useGameState() {
     })
   }, [])
 
+  const JUMP_SCARE_ALLOWED: SceneId[] = [
+    'SCENE_01', 'SCENE_02', 'SCENE_03',
+    'PHASE_1_RPS',
+    'PHASE_2_ENTRY', 'PHASE_2_RPS', 'PHASE_2_QUESTION', 'PHASE_2_REACTION',
+    'ESCAPE_FROST', 'ESCAPE_HOLD',
+  ]
+
   const updateHandLost = useCallback((seconds: number) => {
     setState(s => {
-      if (seconds >= 5) return { ...s, scene: 'JUMP_SCARE', handLostSeconds: seconds }
+      if (seconds >= 5 && JUMP_SCARE_ALLOWED.includes(s.scene))
+        return { ...s, scene: 'JUMP_SCARE', handLostSeconds: seconds }
       return { ...s, handLostSeconds: seconds }
     })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const setReaction = useCallback((reaction: string | null) => {
     advance({ pendingReaction: reaction })
