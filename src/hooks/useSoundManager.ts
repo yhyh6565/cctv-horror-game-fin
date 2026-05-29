@@ -5,7 +5,7 @@ const SFX_FILES = {
   elevator_loop: '/sounds/elevator_loop.mp3',
   door_creak: '/sounds/door_creak.mp3',
   ghost_signal: '/sounds/ghost_signal.mp3',
-  mirror_bang: '/sounds/mirror_bang.mp3',
+  mirror_bang: '/sounds/mirror_bang.wav',
   mirror_shatter: '/sounds/mirror_shatter.mp3',
   ghost_laugh: '/sounds/ghost_laugh.mp3',
   jumpscare: '/sounds/jumpscare.mp3',
