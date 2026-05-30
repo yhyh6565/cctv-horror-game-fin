@@ -16,7 +16,7 @@ export default function Background({ image, brightness = 1, faceOffsetRef }: Pro
     let rafId: number
     function loop() {
       if (divRef.current) {
-        const { x, y } = faceOffsetRef.current
+        const { x, y } = faceOffsetRef!.current
         divRef.current.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(1.08)`
       }
       rafId = requestAnimationFrame(loop)

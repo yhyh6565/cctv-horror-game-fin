@@ -7,27 +7,13 @@ interface Props {
 
 export default function QuestionInput({ onAnswer }: Props) {
   const [question, setQuestion] = useState('')
-  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!question.trim()) return
     const keyword = matchKeyword(question)
     if (keyword) { onAnswer(keyword); return }
 
-    setLoading(true)
-    try {
-      const res = await fetch('/api/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question }),
-      })
-      const { answer } = await res.json()
-      onAnswer(answer)
-    } catch {
-      onAnswer('알 수 없다.')
-    } finally {
-      setLoading(false)
-    }
+    onAnswer('알 수 없다.')
   }
 
   return (
@@ -42,10 +28,9 @@ export default function QuestionInput({ onAnswer }: Props) {
       />
       <button
         onClick={handleSubmit}
-        disabled={loading}
         className="mt-2 w-full bg-gray-800 text-gray-300 text-xs py-2 rounded hover:bg-gray-700"
       >
-        {loading ? '…' : '묻기'}
+        묻기
       </button>
     </div>
   )
