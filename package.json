@@ -15,6 +15,7 @@
     "@mediapipe/face_detection": "^0.4.1646425229",
     "@mediapipe/hands": "^0.4.1675469240",
     "@tailwindcss/vite": "^4.3.0",
+    "@vercel/analytics": "^2.0.1",
     "howler": "^2.2.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
