@@ -2,6 +2,12 @@
 
 <!-- Append new entries at the top. Format: ## YYYY-MM-DD -->
 
+## 2026-05-30
+**Done:** 별도 코드 작업 없음. 사운드 파일 로컬 미리보기 방법 확인 (afplay / Finder 스페이스바).
+**Decisions:** —
+**Feedback:** —
+**Blockers:** —
+
 ## 2026-05-29 (2차)
 **Done:**
 - YEO-15: 사운드 12개 CC0/Public Domain 소스에서 직접 다운로드 + public/sounds/ 배치
