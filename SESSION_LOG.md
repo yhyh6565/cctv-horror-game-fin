@@ -2,6 +2,24 @@
 
 <!-- Append new entries at the top. Format: ## YYYY-MM-DD -->
 
+## 2026-05-31
+**Done:**
+- YEO-35/36: Vercel 프로젝트 생성 + GitHub 연결 + Production 배포 (https://mirror-vn.vercel.app)
+- 보안 검사 실시 — api/ask.ts 삭제 (무인증 엔드포인트), @vercel/node 제거 (CVE 6개 해소), npm audit 0 취약점
+- Groq API 제거 → QuestionInput 키워드 미매칭 시 "알 수 없다." 고정 응답
+- vercel.json buildCommand/outputDirectory 명시
+- Background.tsx TS18048 오류 수정 (faceOffsetRef! non-null assertion)
+- @vercel/analytics 추가 + inject() main.tsx 삽입 → PR #2 머지 후 재배포
+
+**Decisions:**
+- Groq API 제거: 배포 단순화 + 환경변수 없이도 게임 동작 가능. 엔딩 트리거는 키워드 매칭이라 영향 없음.
+- api/ask.ts 삭제: Vercel이 api/ 폴더를 자동 감지해 serverless function으로 배포 → 보안 위험 제거
+
+**Feedback:** —
+
+**Blockers:**
+- Vercel Deployment Protection 기본값으로 켜져 있어 배포 후 외부 접근 불가 → 대시보드에서 수동으로 꺼야 했음
+
 ## 2026-05-30
 **Done:** 별도 코드 작업 없음. 사운드 파일 로컬 미리보기 방법 확인 (afplay / Finder 스페이스바).
 **Decisions:** —

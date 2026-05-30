@@ -1,32 +1,32 @@
 # mirror-vn — HANDOFF
-Last session: 2026-05-30 | Status: active | Linear: YEO-15~19 전부 Done
+Last session: 2026-05-31 | Status: active | Linear: YEO-35, YEO-36 Done
 
 ## Where we left off
-전 세션(2026-05-29)에서 버그 5개 + 사운드 12개 모두 완료. 오늘(2026-05-30)은 사운드 파일 로컬 미리보기 방법 확인만 함.
+Vercel 배포 완료 + Vercel Analytics 추가 배포까지 마침.
 
-완료된 전체 픽스 (이전 세션):
-- **YEO-16 (C2):** JUMP_SCARE_ALLOWED 씬 가드 추가 — 엔딩 중 발동 방지
-- **YEO-17 (C3):** TRUE_ENDING → ENDING_SCREEN_TRUE 연결 + 트랜스크립트
-- **YEO-18 (M1):** useSoundManager unmount cleanup (Howl leak 방지)
-- **YEO-19 (M2):** PHASE2_ROUND2_TIE / PHASE2_ROUND3_SETUP 씬 연결 (펜 트릭 내러티브)
-- **YEO-15 (C1):** 사운드 12개 `public/sounds/`에 배치. 전부 CC0/Public Domain.
-  - 포맷 혼재: .mp3 (9개), .wav (whisper, mirror_bang), .ogg (bad_drone)
-  - useSoundManager 경로 업데이트 완료
+- **YEO-35/36:** vercel.json 빌드 설정, Groq API 제거(→ "알 수 없다." 고정), 보안 검사 통과, Production 배포
+- **보안:** api/ask.ts 삭제 (무인증 엔드포인트 위험), @vercel/node 제거 (CVE 6개 해소), npm audit 0 취약점
+- **Analytics:** @vercel/analytics inject() — PR #2 머지 후 재배포 완료
+- **Production URL:** https://mirror-vn.vercel.app
 
 ## What's next
-`npm run dev`로 게임 실행 — 사운드 + 전체 플로우 직접 확인.
-특히 확인할 것: elevator_loop 루프 여부, ghost_signal 길이(2.7MB — 너무 길 수 있음), jumpscare 타이밍.
+게임 실제 접속해서 전체 플로우 직접 확인:
+- 사운드 재생 여부 (elevator_loop 루프, jumpscare 타이밍)
+- 웹캠 손 제스처 → 씬 전환
+- 엔딩 진입 (True Ending, Bad Ending)
+- 질문 씬에서 "알 수 없다." 표시 확인
 
 ## Open decisions
+- CSP 헤더 미설정 — MediaPipe가 cdn.jsdelivr.net에서 WASM 로드 (post-launch Medium 이슈)
 - True Ending 트랜스크립트 톤 확인 ("의식 성공적으로 종료됨"이 세계관에 맞는지)
-- M2 Round2Confirm 트리거: insightTriggered 없을 때도 발동해야 하는지 (현재 insightTriggered=true 조건부)
-- CC BY 라이선스 파일 3개 크레딧 처리 (door_creak CC BY, mirror_shatter CC BY, jumpscare CC BY) — README 또는 게임 내 화면
+- 웹캠 권한 거부 시 에러 핸들링 없음 (silent fail — UX 개선 필요)
+- CC BY 라이선스 파일 3개 크레딧 처리 (door_creak, mirror_shatter, jumpscare)
 
 ## Context for Claude
-- 모든 변경 main 브랜치에 직접 커밋됨 (⚠️ 다음 코드 작업 전 반드시 feature branch 먼저 — CLAUDE.md 규칙)
-- 사운드 파일 경로: whisper → .wav, bad_drone → .ogg, mirror_bang → .wav (나머지 .mp3)
-- Stack: TypeScript, Vite, WebRTC webcam API, pure web (no RPG Maker, no Three.js)
+- Production URL: https://mirror-vn.vercel.app (Deployment Protection 꺼져 있음, 공개 접근 가능)
+- Vercel 프로젝트: yeonheedo1127-4440s-projects/mirror-vn
+- GitHub 레포: yhyh6565/cctv-horror-game-fin (main 브랜치)
+- Groq API 완전 제거됨 — api/ask.ts 없음, @vercel/node 없음
+- Stack: TypeScript, Vite, React, WebRTC webcam API (no Three.js)
 - Hand gesture: debounce 300ms minimum
 - iOS Safari webcam permission 미테스트
-- Do NOT use Three.js
-- 사운드 로컬 미리보기: `afplay public/sounds/<file>` 또는 Finder에서 스페이스바 (bad_drone.ogg는 VLC 필요)
