@@ -293,8 +293,10 @@ export default function GameScene({ onRetry }: Props) {
         />
       )}
 
-      {/* Layer 40: 층수 표시 */}
-      <FloorDisplay floor={p1.floor} glitch={isGlitch} />
+      {/* Layer 40: 층수 표시 — 인트로 씬 중에는 숨김 */}
+      {!['SCENE_01', 'SCENE_02', 'SCENE_03', 'PHASE_2_ENTRY'].includes(scene) && (
+        <FloorDisplay floor={p1.floor} glitch={isGlitch} />
+      )}
 
       {/* Layer 50: 씬 텍스트 */}
       {(SCENE_PLAYER_SCENES as readonly string[]).includes(scene) && (

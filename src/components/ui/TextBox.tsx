@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { ScriptLine } from '../../data/scenes'
 
 interface Props {
@@ -39,42 +39,51 @@ export default function TextBox({ line, onComplete }: Props) {
     return () => clearInterval(timer)
   }, [line])
 
-  if (!line) return null
-
-  const handleClick = () => {
-    if (done) onComplete()
-    else {
-      // 스킵: 전체 텍스트 즉시 출력
+  const handleAdvance = useCallback(() => {
+    if (!line) return
+    if (done) {
+      onComplete()
+    } else {
       const fullText = line.type === 'ghost_takeover'
         ? line.text + ' ' + (line.ghostWord ?? '')
         : line.text
       setDisplayed(fullText)
       setDone(true)
     }
-  }
+  }, [done, line, onComplete])
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') handleAdvance()
+    }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [handleAdvance])
+
+  if (!line) return null
 
   return (
     <div
-      onClick={handleClick}
+      onClick={handleAdvance}
       className="absolute bottom-0 left-0 right-0 z-50 p-4 cursor-pointer"
     >
-      <div className="bg-black/80 border border-gray-700 rounded p-4 min-h-[80px]">
+      <div className="bg-black/80 border border-gray-700 rounded p-5 min-h-[140px]">
         {line.type === 'system' && (
-          <p className="text-yellow-400 font-mono text-sm leading-relaxed whitespace-pre-line">
+          <p className="text-yellow-400 font-mono text-base leading-relaxed whitespace-pre-line">
             {displayed}
           </p>
         )}
         {line.type === 'narration' && (
-          <p className="text-white text-sm leading-relaxed">{displayed}</p>
+          <p className="text-white text-base leading-relaxed">{displayed}</p>
         )}
         {line.type === 'inner' && (
-          <p className="text-gray-300 italic text-sm leading-relaxed">{displayed}</p>
+          <p className="text-gray-300 italic text-base leading-relaxed">{displayed}</p>
         )}
         {line.type === 'ghost' && (
-          <p className="text-gray-500 italic text-sm leading-relaxed tracking-wide">{displayed}</p>
+          <p className="text-gray-500 italic text-base leading-relaxed tracking-wide">{displayed}</p>
         )}
         {line.type === 'reveal' && (
-          <p className="text-red-400 font-bold text-base leading-relaxed">{displayed}</p>
+          <p className="text-red-400 font-bold text-lg leading-relaxed">{displayed}</p>
         )}
         {line.type === 'ghost_takeover' && (
           <GhostTakeoverLine line={line} displayed={displayed} />

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { RefObject, MutableRefObject } from 'react'
 
-const MAX_OFFSET = 20  // px, max background shift in each direction
+const MAX_OFFSET = 32  // px, max background shift in each direction
 const LERP = 0.06      // smoothing: lower = smoother but slower to respond
 
 export function useFaceTracking(
@@ -43,7 +43,9 @@ export function useFaceTracking(
         // Send frame to face detector (skip if previous frame still processing)
         if (!processing && videoRef.current && videoRef.current.readyState >= 2) {
           processing = true
-          faceDetection.send({ image: videoRef.current })
+          Promise.resolve(faceDetection.send({ image: videoRef.current })).catch(() => {
+            processing = false
+          })
         }
 
         rafId = requestAnimationFrame(loop)
