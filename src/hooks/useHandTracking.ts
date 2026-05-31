@@ -42,27 +42,35 @@ export function useHandTracking({
   const lastGesture = useRef<Gesture>('none')
   const GESTURE_HOLD_MS = 800
 
+  // Keep latest callbacks in a ref so handleResults stays stable.
+  // Without this, setPalmX at 60fps causes GameScene to re-render → new arrow functions →
+  // handleResults changes → useEffect fires → camera stops and restarts every frame.
+  const cbRef = useRef({ onGesture, onHandLost, onPointingCb, onPalmX })
+  useEffect(() => {
+    cbRef.current = { onGesture, onHandLost, onPointingCb, onPalmX }
+  })
+
   const handleResults = useCallback((results: any) => {
     if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
       if (!handLostStart.current) handLostStart.current = Date.now()
       const elapsed = (Date.now() - handLostStart.current) / 1000
-      onHandLost(elapsed)
+      cbRef.current.onHandLost(elapsed)
       gestureHoldStart.current = null
       lastGesture.current = 'none'
-      onPointingCb(false)
+      cbRef.current.onPointingCb(false)
       return
     }
 
     handLostStart.current = null
-    onHandLost(0)
+    cbRef.current.onHandLost(0)
 
     const lm = results.multiHandLandmarks[0]
     const gesture = classifyGesture(lm)
     const pointing = isPointing(lm)
     const palmX = getPalmCenterX(lm)
 
-    onPointingCb(pointing)
-    onPalmX(palmX)
+    cbRef.current.onPointingCb(pointing)
+    cbRef.current.onPalmX(palmX)
 
     if (gesture !== lastGesture.current) {
       lastGesture.current = gesture
@@ -70,11 +78,11 @@ export function useHandTracking({
     } else if (gesture !== 'none' && gestureHoldStart.current) {
       const held = Date.now() - gestureHoldStart.current
       if (held >= GESTURE_HOLD_MS) {
-        onGesture(gesture)
+        cbRef.current.onGesture(gesture)
         gestureHoldStart.current = null  // 재트리거 방지
       }
     }
-  }, [onGesture, onHandLost, onPointingCb, onPalmX])
+  }, []) // stable — always reads from cbRef.current
 
   useEffect(() => {
     let hands: any

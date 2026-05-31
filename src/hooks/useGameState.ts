@@ -85,7 +85,6 @@ export function useGameState() {
   }, [])
 
   const JUMP_SCARE_ALLOWED: SceneId[] = [
-    'SCENE_01', 'SCENE_02', 'SCENE_03',
     'PHASE_1_RPS',
     'PHASE_2_ENTRY', 'PHASE_2_RPS', 'PHASE_2_QUESTION', 'PHASE_2_REACTION',
     'ESCAPE_FROST', 'ESCAPE_HOLD',
