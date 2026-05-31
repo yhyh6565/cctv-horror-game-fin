@@ -18,6 +18,27 @@ const SFX_FILES = {
 
 type SfxKey = keyof typeof SFX_FILES
 
+function playElevatorDing() {
+  try {
+    const ctx = new AudioContext()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    // 엘리베이터 '띵' — 맑은 종소리 (880Hz + 2차 하모닉)
+    osc.frequency.value = 880
+    osc.type = 'sine'
+    gain.gain.setValueAtTime(0.45, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 1.2)
+    // 서스테인 후 ctx 정리
+    osc.onended = () => ctx.close()
+  } catch {
+    // AudioContext not available (e.g., server-side)
+  }
+}
+
 export function useSoundManager() {
   const sounds = useRef<Partial<Record<SfxKey, Howl>>>({})
   const muted = useRef(false)
@@ -28,8 +49,12 @@ export function useSoundManager() {
     }
   }, [])
 
-  const play = useCallback((key: SfxKey) => {
+  const play = useCallback((key: SfxKey | 'elevator_ding') => {
     if (muted.current) return
+    if (key === 'elevator_ding') {
+      playElevatorDing()
+      return
+    }
     if (!sounds.current[key]) {
       sounds.current[key] = new Howl({ src: [SFX_FILES[key]], preload: true })
     }

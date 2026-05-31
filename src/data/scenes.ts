@@ -3,8 +3,9 @@ import type { TextLineType } from '../types/game'
 export interface ScriptLine {
   type: TextLineType
   text: string
-  // ghost_takeover 타입에서 일반 텍스트와 귀신 텍스트를 분리
-  ghostWord?: string  // 이 단어만 귀신 스타일로 렌더링
+  ghostWord?: string       // ghost_takeover: 이 단어만 귀신 스타일로 렌더링
+  sound?: string           // 라인 시작 시 재생할 사운드 키
+  autoAdvanceMs?: number   // 지정 ms 후 클릭 없이 자동 다음 라인
 }
 
 export const SCENES: Record<string, ScriptLine[]> = {
@@ -16,11 +17,10 @@ export const SCENES: Record<string, ScriptLine[]> = {
     { type: 'system', text: '[5F]' },
   ],
   SCENE_02: [
-    { type: 'narration', text: '-수리 중-' },
-    { type: 'narration', text: '빠르게 고치겠습니다. 행복나라아파트 경비실' },
+    { type: 'notice', text: '-수리 중-\n빠르게 고치겠습니다.\n행복나라아파트 경비실' },
     { type: 'inner', text: '바로 이거다.' },
     { type: 'narration', text: '떨리는 손으로 엘리베이터를 호출했다.' },
-    { type: 'system', text: '[땡]' },
+    { type: 'system', text: '[땡]', sound: 'elevator_ding' },
     { type: 'narration', text: '열리는 문 사이로 녹슬고 어둑한 내부. 바닥은 그을음으로 더럽다.' },
     { type: 'narration', text: '오른쪽과 왼쪽에 나란히 붙어 있는 것— 손자국이 난 더러운 거울.' },
     { type: 'inner', text: '…후.' },
@@ -29,9 +29,9 @@ export const SCENES: Record<string, ScriptLine[]> = {
   SCENE_03: [
     { type: 'system', text: '[올라갑니다.] 띵.' },
     { type: 'narration', text: '버튼을 누르지 않았는데도 엘리베이터가 움직인다.' },
-    { type: 'system', text: '※ 엘리베이터가 혼자 움직이기 시작했다면 의식 진입 성공.' },
-    { type: 'system', text: '1. 이제부터 최고층에 도착할 때까지 거울 속의 나와 가위바위보를 한다.' },
-    { type: 'system', text: '※ 의식 도중 3초 이상 손이 사라지지 않게 하십시오.' },
+    { type: 'system', text: '※ 엘리베이터가 혼자 움직이기 시작했다면 의식 진입 성공.', autoAdvanceMs: 2500 },
+    { type: 'system', text: '1. 이제부터 최고층에 도착할 때까지 거울 속의 나와 가위바위보를 한다.', autoAdvanceMs: 3000 },
+    { type: 'system', text: '※ 의식 도중 3초 이상 손이 사라지지 않게 하십시오.', autoAdvanceMs: 2500 },
   ],
   PHASE_2_ENTRY: [
     { type: 'system', text: '[덜컹.]' },

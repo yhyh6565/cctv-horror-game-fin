@@ -19,7 +19,7 @@ export type SceneId =
   | 'TRUE_ENDING'
 
 export type Gesture = 'rock' | 'paper' | 'scissors' | 'none'
-export type TextLineType = 'narration' | 'inner' | 'system' | 'ghost' | 'reveal' | 'ghost_takeover'
+export type TextLineType = 'narration' | 'inner' | 'system' | 'ghost' | 'reveal' | 'ghost_takeover' | 'notice'
 
 export interface Phase1State {
   round: number    // 1-5

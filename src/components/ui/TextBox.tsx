@@ -39,6 +39,13 @@ export default function TextBox({ line, onComplete }: Props) {
     return () => clearInterval(timer)
   }, [line])
 
+  // autoAdvanceMs: 타이핑 완료 후 지정 시간 지나면 자동 다음 라인
+  useEffect(() => {
+    if (!done || !line?.autoAdvanceMs) return
+    const t = setTimeout(() => onComplete(), line.autoAdvanceMs)
+    return () => clearTimeout(t)
+  }, [done, line, onComplete])
+
   const handleAdvance = useCallback(() => {
     if (!line) return
     if (done) {

@@ -300,7 +300,11 @@ export default function GameScene({ onRetry }: Props) {
 
       {/* Layer 50: 씬 텍스트 */}
       {(SCENE_PLAYER_SCENES as readonly string[]).includes(scene) && (
-        <ScenePlayer sceneKey={scene} onComplete={handleSceneComplete} />
+        <ScenePlayer
+          sceneKey={scene}
+          onComplete={handleSceneComplete}
+          onSound={(key) => play(key as Parameters<typeof play>[0])}
+        />
       )}
 
       {/* RPS 안내 */}
