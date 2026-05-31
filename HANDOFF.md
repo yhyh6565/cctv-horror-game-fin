@@ -1,32 +1,43 @@
 # mirror-vn — HANDOFF
-Last session: 2026-05-31 | Status: active | Linear: YEO-35, YEO-36 Done
+Last session: 2026-05-31 | Status: active | Branch: main (code on main — no feature branch this session)
 
 ## Where we left off
-Vercel 배포 완료 + Vercel Analytics 추가 배포까지 마침.
+QA 버그 수정 세션. Phase 1 진입 버그 2건 수정 + 인트로 UX 대폭 개선.
 
-- **YEO-35/36:** vercel.json 빌드 설정, Groq API 제거(→ "알 수 없다." 고정), 보안 검사 통과, Production 배포
-- **보안:** api/ask.ts 삭제 (무인증 엔드포인트 위험), @vercel/node 제거 (CVE 6개 해소), npm audit 0 취약점
-- **Analytics:** @vercel/analytics inject() — PR #2 머지 후 재배포 완료
-- **Production URL:** https://mirror-vn.vercel.app
+**완료한 것:**
+- `docs/scenario.md` 생성 — 전체 게임 스크립트 씬별 정리 (시나리오 문서)
+- `TextBox.tsx` 재작성 — Rules of Hooks 위반 수정, Enter 키 진행, `autoAdvanceMs` 자동 전환, 창 크기/글씨 키움 (`min-h-[140px]`, `text-base`)
+- `TornNotice.tsx` 신규 — CSS 찢어진 종이 효과 (SCENE_02 수리중 안내문)
+- `scenes.ts` — SCENE_02 안내문 `notice` 타입 적용, SCENE_03 지시문 `autoAdvanceMs` 자동전환, `[땡]` 사운드 트리거
+- `useSoundManager.ts` — `playElevatorDing()` Web Audio API 합성음 추가
+- `useFaceTracking.ts` — MAX_OFFSET 20→32, `.catch()` 오류 방어 추가
+- `GameScene.tsx` — 인트로 씬 중 FloorDisplay 숨김, `handleSceneComplete` useCallback 안정화
+- **Phase 1 진입 버그 수정:**
+  - `useGameState.ts`: `JUMP_SCARE_ALLOWED`에서 `SCENE_01/02/03` 제거 (인트로 중 점프스케어 방지)
+  - `useHandTracking.ts`: `cbRef` 패턴으로 `handleResults` 안정화 (60fps 재렌더 → 카메라 stop/restart 루프 해결)
 
 ## What's next
-게임 실제 접속해서 전체 플로우 직접 확인:
-- 사운드 재생 여부 (elevator_loop 루프, jumpscare 타이밍)
-- 웹캠 손 제스처 → 씬 전환
-- 엔딩 진입 (True Ending, Bad Ending)
-- 질문 씬에서 "알 수 없다." 표시 확인
+**https://mirror-vn.vercel.app 직접 접속 → Phase 1 진입 확인**
+- SCENE_01→02→03 순서대로 진행되는지 (Enter 키 작동, SCENE_03 자동전환)
+- TornNotice 수리중 안내문 표시 확인
+- Phase 1 RPS 진입 및 가위바위보 작동 확인
 
 ## Open decisions
-- CSP 헤더 미설정 — MediaPipe가 cdn.jsdelivr.net에서 WASM 로드 (post-launch Medium 이슈)
-- True Ending 트랜스크립트 톤 확인 ("의식 성공적으로 종료됨"이 세계관에 맞는지)
-- 웹캠 권한 거부 시 에러 핸들링 없음 (silent fail — UX 개선 필요)
-- CC BY 라이선스 파일 3개 크레딧 처리 (door_creak, mirror_shatter, jumpscare)
+- **SCENE_01/02 배경 이미지** (YEO-50): AI 이미지 생성 필요. Midjourney/DALL-E 중 어느 쪽 쓸지 결정 필요.
+- CSP 헤더 미설정 — MediaPipe cdn.jsdelivr.net WASM 로드 (post-launch Medium)
+- 웹캠 권한 거부 시 에러 핸들링 없음 (silent fail)
+- CC BY 라이선스 3개 파일 크레딧 처리 (door_creak, mirror_shatter, jumpscare)
+
+## Pending tickets
+- **YEO-43**: ghost_laugh.mp3 + mirror_bang.wav 교체 (소리가 세계관에 안 맞음)
+- **YEO-44**: bg_0.png 층수 표시 불일치
+- **YEO-46**: SCENE_02 찢어진 종이 실제 이미지 교체 (현재 CSS 버전)
+- **YEO-50**: SCENE_01/02 배경 이미지 생성
 
 ## Context for Claude
-- Production URL: https://mirror-vn.vercel.app (Deployment Protection 꺼져 있음, 공개 접근 가능)
-- Vercel 프로젝트: yeonheedo1127-4440s-projects/mirror-vn
-- GitHub 레포: yhyh6565/cctv-horror-game-fin (main 브랜치)
-- Groq API 완전 제거됨 — api/ask.ts 없음, @vercel/node 없음
+- Production URL: https://mirror-vn.vercel.app
+- GitHub 레포: yhyh6565/cctv-horror-game-fin (main 브랜치, 직접 커밋 중 — branch 규칙 미준수 상태)
 - Stack: TypeScript, Vite, React, WebRTC webcam API (no Three.js)
-- Hand gesture: debounce 300ms minimum
+- `cbRef` 패턴: `useHandTracking`이 이제 callback ref로 동작 — `handleResults` deps 없음 (안정적)
+- Nanum Myeongjo 폰트 Google Fonts에서 임포트 중 (CSS `@import` 순서 경고 있으나 빌드 통과)
 - iOS Safari webcam permission 미테스트

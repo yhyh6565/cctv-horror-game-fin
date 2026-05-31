@@ -2,6 +2,28 @@
 
 <!-- Append new entries at the top. Format: ## YYYY-MM-DD -->
 
+## 2026-05-31 (2차)
+**Done:**
+- `docs/scenario.md` 생성 + main 푸시 — 전체 게임 스크립트 씬별 타입 표기 포함
+- `TextBox.tsx` 재작성: Rules of Hooks 위반 수정 (hooks before early return), Enter 키 진행, `autoAdvanceMs` 자동전환 타이머, 창 크기/글씨 개선
+- `TornNotice.tsx` 신규: CSS 찢어진 종이 효과 (clip-path polygon, 테이프 마크, 나눔명조)
+- `scenes.ts`: SCENE_02 안내문 `notice` 타입, SCENE_03 지시문 `autoAdvanceMs`, `[땡]` `elevator_ding` 사운드
+- `useSoundManager.ts`: `playElevatorDing()` Web Audio API 합성 (880Hz sine, 1.2s decay)
+- `useFaceTracking.ts`: MAX_OFFSET 20→32, `.catch()` 오류 방어
+- `GameScene.tsx`: 인트로 씬 FloorDisplay 숨김, `handleSceneComplete` useCallback 안정화
+- Phase 1 진입 버그 수정 2건:
+  - `useGameState.ts`: `JUMP_SCARE_ALLOWED`에서 `SCENE_01/02/03` 제거
+  - `useHandTracking.ts`: `cbRef` 패턴으로 `handleResults` 안정화 (60fps 재렌더 → 카메라 루프 해결)
+- YEO-50 Linear 티켓 생성 (SCENE_01/02 배경 이미지 생성)
+
+**Decisions:**
+- `cbRef` 패턴 채택: `handleResults`를 stable하게 만들어 MediaPipe 카메라 재초기화 루프 방지. 콜백 props를 직접 deps에 넣는 대신 ref에 최신 값을 유지.
+- TornNotice는 CSS로 먼저 구현 (이미지 생성 전 placeholder). YEO-46으로 실제 이미지 교체 예정.
+
+**Feedback:** —
+
+**Blockers:** —
+
 ## 2026-05-31
 **Done:**
 - YEO-35/36: Vercel 프로젝트 생성 + GitHub 연결 + Production 배포 (https://mirror-vn.vercel.app)
