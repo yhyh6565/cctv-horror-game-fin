@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { SCENES } from '../../data/scenes'
 import TextBox from '../ui/TextBox'
 import TornNotice from './TornNotice'
@@ -25,13 +25,13 @@ export default function ScenePlayer({ sceneKey, onComplete, onSound }: Props) {
     }
   }, [lineIndex, sceneKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleLineComplete = () => {
+  const handleLineComplete = useCallback(() => {
     if (lineIndex < lines.length - 1) {
       setLineIndex(i => i + 1)
     } else {
       onComplete()
     }
-  }
+  }, [lineIndex, lines.length, onComplete])
 
   if (currentLine?.type === 'notice') {
     return <TornNotice text={currentLine.text} onComplete={handleLineComplete} />

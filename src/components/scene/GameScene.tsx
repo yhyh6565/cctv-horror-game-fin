@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { useGameState, resolvePhase2 } from '../../hooks/useGameState'
 import { useHandTracking } from '../../hooks/useHandTracking'
 import { useFaceTracking } from '../../hooks/useFaceTracking'
@@ -245,12 +245,12 @@ export default function GameScene({ onRetry }: Props) {
   const isPhase2 = scene.startsWith('PHASE_2') || scene === 'WIN_CUTSCENE'
   const isGlitch = scene === 'PHASE_2_ENTRY'
 
-  const handleSceneComplete = () => {
+  const handleSceneComplete = useCallback(() => {
     if (scene === 'SCENE_01') goTo('SCENE_02')
     else if (scene === 'SCENE_02') goTo('SCENE_03')
     else if (scene === 'SCENE_03') goTo('PHASE_1_RPS')
     else if (scene === 'PHASE_2_ENTRY') goTo('PHASE_2_RPS')
-  }
+  }, [scene, goTo])
 
   if (scene === 'IDLE') {
     return (
