@@ -26,3 +26,7 @@ TypeScript, Vite, WebRTC webcam API, pure web (no RPG Maker, no Three.js)
 ## Known issues / Do not repeat
 - Three.js: attempted and reverted — overkill for 2D scene
 - iOS 16 webcam permission gate is non-standard — handle separately
+
+## Linear
+Project: **mirror-vn** (ID: `3ff2df06-cef6-47e8-b64d-732a2860b847`)
+When creating any ticket for this repo, always pass `project: "mirror-vn"`.
