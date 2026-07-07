@@ -1,43 +1,28 @@
 # mirror-vn — HANDOFF
-Last session: 2026-05-31 | Status: active | Branch: main (code on main — no feature branch this session)
+Last session: 2026-07-07 | Status: active | Branch: main (docs만 커밋 — 코드 작업 없음)
 
 ## Where we left off
-QA 버그 수정 세션. Phase 1 진입 버그 2건 수정 + 인트로 UX 대폭 개선.
+**리빌드 결정 + 기획 확정 세션.** 기존 구현의 점진 수정을 버리고 기획안 기준 재구축으로 피벗.
 
 **완료한 것:**
-- `docs/scenario.md` 생성 — 전체 게임 스크립트 씬별 정리 (시나리오 문서)
-- `TextBox.tsx` 재작성 — Rules of Hooks 위반 수정, Enter 키 진행, `autoAdvanceMs` 자동 전환, 창 크기/글씨 키움 (`min-h-[140px]`, `text-base`)
-- `TornNotice.tsx` 신규 — CSS 찢어진 종이 효과 (SCENE_02 수리중 안내문)
-- `scenes.ts` — SCENE_02 안내문 `notice` 타입 적용, SCENE_03 지시문 `autoAdvanceMs` 자동전환, `[땡]` 사운드 트리거
-- `useSoundManager.ts` — `playElevatorDing()` Web Audio API 합성음 추가
-- `useFaceTracking.ts` — MAX_OFFSET 20→32, `.catch()` 오류 방어 추가
-- `GameScene.tsx` — 인트로 씬 중 FloorDisplay 숨김, `handleSceneComplete` useCallback 안정화
-- **Phase 1 진입 버그 수정:**
-  - `useGameState.ts`: `JUMP_SCARE_ALLOWED`에서 `SCENE_01/02/03` 제거 (인트로 중 점프스케어 방지)
-  - `useHandTracking.ts`: `cbRef` 패턴으로 `handleResults` 안정화 (60fps 재렌더 → 카메라 stop/restart 루프 해결)
+- 기획 리뷰 콜아웃 9건 전부 확정 (Phase 2 각본화·힌트 제거, R3 인과 독백, Phase 1 패배 수→연출 차등, 손 이력 텍스트 상시 노출, Dead Ending 감지 기준 타이머, 3s 경고/5s 발동, ESCAPE_HOLD 위치 판정+실패 루프, True Ending 질문 1회, 귀신 질문 진실/거짓 2택+10s 제한)
+- **시점 확정: 1인칭** (엘리베이터 안에서 거울을 직접 봄) — CCTV 톤 아님, 레이어 스택의 CCTV 필터 → 톤 필터(그레인·비네트)로 교체
+- 원작 재확인 (나무위키/포스타입): 보상 질문 1회, "3번의 대답"은 귀신이 묻는 쪽, 거짓 대답 = 즉사
+- `docs/PRD.md` 작성 + main 푸시 (`0398556`) — 판정 규칙 single source of truth
+- Linear 재구성: 구 미완료 티켓 6건 캔슬 (YEO-5/42/43/44/46/50), 리빌드 부모 YEO-597 + 서브이슈 YEO-598~606 생성, YEO-598 → In Review
 
 ## What's next
-**https://mirror-vn.vercel.app 직접 접속 → Phase 1 진입 확인**
-- SCENE_01→02→03 순서대로 진행되는지 (Enter 키 작동, SCENE_03 자동전환)
-- TornNotice 수리중 안내문 표시 확인
-- Phase 1 RPS 진입 및 가위바위보 작동 확인
+**PRD §4.2 Phase 2 각본 수정 확정.** 마지막 논의에서 "귀신 ✊ 고정 + 무조건 패배" 테이블의 논리 결함(유저 보 = RPS상 승리)을 발견. 제안한 수정안 = **후출 미러링 규칙** (귀신은 이기는 손을 후출, 유저가 보면 가위 불가 → 보 미러링으로 비김 → 유저는 절대 못 이김, Phase 1과 동일 규칙). 유저가 "확률적 해피패스" 가능성을 언급한 상태에서 세션 종료 — **답변 대기 중.** 확정되면 PRD 수정 → YEO-599([1] 데이터 주도 씬 시스템) 착수.
 
 ## Open decisions
-- **SCENE_01/02 배경 이미지** (YEO-50): AI 이미지 생성 필요. Midjourney/DALL-E 중 어느 쪽 쓸지 결정 필요.
-- CSP 헤더 미설정 — MediaPipe cdn.jsdelivr.net WASM 로드 (post-launch Medium)
-- 웹캠 권한 거부 시 에러 핸들링 없음 (silent fail)
-- CC BY 라이선스 3개 파일 크레딧 처리 (door_creak, mirror_shatter, jumpscare)
-
-## Pending tickets
-- **YEO-43**: ghost_laugh.mp3 + mirror_bang.wav 교체 (소리가 세계관에 안 맞음)
-- **YEO-44**: bg_0.png 층수 표시 불일치
-- **YEO-46**: SCENE_02 찢어진 종이 실제 이미지 교체 (현재 CSS 버전)
-- **YEO-50**: SCENE_01/02 배경 이미지 생성
+- **Phase 2 각본: 후출 미러링 vs 확률적 해피패스** (전자 추천 — 인사이트/펜 트릭 클라이맥스 보존, 난수 0% 유지)
+- PRD Open Questions: Q3 "지금 무서워?" 삽입 지점 / Bad Ending 99조 문안 / ROUND3_SETUP 독백 문안 (전부 문안 작업, 급하지 않음)
+- 모델 전략: 기본 Sonnet, Fable 필요 항목만 전환 — [4] Phase 2 위화감 처리·R3 독백, [3] 톤 필터 감각 튜닝, [6] 99조 문안, [7] 페르소나 프롬프트+인젝션 방어
 
 ## Context for Claude
-- Production URL: https://mirror-vn.vercel.app
-- GitHub 레포: yhyh6565/cctv-horror-game-fin (main 브랜치, 직접 커밋 중 — branch 규칙 미준수 상태)
-- Stack: TypeScript, Vite, React, WebRTC webcam API (no Three.js)
-- `cbRef` 패턴: `useHandTracking`이 이제 callback ref로 동작 — `handleResults` deps 없음 (안정적)
-- Nanum Myeongjo 폰트 Google Fonts에서 임포트 중 (CSS `@import` 순서 경고 있으나 빌드 통과)
-- iOS Safari webcam permission 미테스트
+- `docs/PRD.md`가 모든 판정 규칙의 단일 출처 — 코드는 이 문서의 테이블을 데이터로 옮긴 것이어야 함. 문서에 없는 규칙 구현 금지
+- 핵심 원칙: 1인칭 시점 / 난수 0% / 규칙 텍스트=판정 일치 / 억울한 죽음 금지 / 명령형 튜토리얼 금지 (안내 3겹: 캘리브레이션·[시스템] 라인·인식 인디케이터) / 원작 지식 전제 (인트로 힌트 심기 없음)
+- 서브이슈 구현 순서: YEO-598(기획, In Review) → 599(씬 FSM) → 600(입력+캘리브레이션) → 601(레이어) → 602(RPS) → 603(탈출) → 604(엔딩) → 605(LLM) → 606(사운드/폴리시). 각 = 1브랜치 + 1PR
+- 기존 코드 재사용 가치: `cbRef` 패턴 (useHandTracking), Canvas 서리 닦기. 현행 HoldButton은 포즈 판정 + 1프레임 즉사 — 리빌드에서 위치 판정으로 교체
+- `src/components/scene/TornNotice.tsx` untracked로 남아 있음 (구 구현 잔재, 5/31 세션) — 리빌드 방향 확정됐으니 정리 대상
+- Production: https://mirror-vn.vercel.app | 레포: yhyh6565/cctv-horror-game-fin
