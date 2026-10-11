@@ -32,3 +32,7 @@ Project: **mirror-vn** (ID: `3ff2df06-cef6-47e8-b64d-732a2860b847`)
 When creating any ticket for this repo, always pass `project: "mirror-vn"`.
 
 ## Wiki type: code
+
+## Vault overview
+
+vault: 10 Personal/apps/mirror-vn/overview.md
