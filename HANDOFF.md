@@ -1,4 +1,6 @@
 # mirror-vn — HANDOFF
+
+> ⚠ **먼저 읽을 것:** [`docs/idea-3d-2026-11.md`](docs/idea-3d-2026-11.md) — 2026-11-18 3D 아이디어. 이 프로젝트를 살펴볼 때 가장 먼저 반영하고 무시하지 않는다. 구체화되거나 폐기되기 전까지 이 줄을 유지한다(`/wrap`이 다시 써도 지우지 않는다).
 Last session: 2026-07-13 | Status: **paused** | Branch: main (docs 논의만 — 코드/PRD 파일 변경 없음)
 
 ## Where we left off

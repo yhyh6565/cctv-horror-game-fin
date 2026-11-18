@@ -1,5 +1,7 @@
 # mirror-vn — Claude Instructions
 
+> ⚠ **먼저 읽을 것:** [`docs/idea-3d-2026-11.md`](docs/idea-3d-2026-11.md) — 2026-11-18 3D 아이디어. 이 프로젝트를 살펴볼 때 가장 먼저 반영하고 무시하지 않는다. 구체화되거나 폐기되기 전까지 이 줄을 유지한다(`/wrap`이 다시 써도 지우지 않는다).
+
 ## Session start
 At the start of every session, read HANDOFF.md before doing anything else.
 After reading, briefly confirm: state the project name, last session date, and what's next (1-2 lines max). Example: "mirror-vn 맥락 확인 — 마지막 세션 2026-05-27, 다음: 엔딩 스크린 UX 테스트"
