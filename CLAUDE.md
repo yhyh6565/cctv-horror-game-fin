@@ -24,6 +24,7 @@ TypeScript, Vite, WebRTC webcam API, pure web (no RPG Maker, no Three.js)
 - No feature without a PRD entry first (docs/PRD.md).
 - No Three.js — use CSS 3D transforms.
 - Always debounce hand gesture events 300ms minimum.
+- 괴담출근 2차 창작 기준: vault `10 Personal/괴담출근/gottawork/fanwork-guideline.md`(KW북스 통합 가이드라인). 비영리 유지, 공식 자산(로고·표지·삽화·웹툰 디자인) 미사용, 비공식 팬 창작 표기, 공식 혼동 회피.
 
 ## Known issues / Do not repeat
 - Three.js: attempted and reverted — overkill for 2D scene
